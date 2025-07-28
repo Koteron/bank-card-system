@@ -22,26 +22,17 @@ public class UserCardServiceImpl implements UserCardService {
     private final CardService cardService;
     private final CardRepository cardRepository;
 
+    @Override
     public CardDto requestCardLock(UUID cardId, UUID ownerId) {
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new NotFoundException("Card not found!"));
 
-        checkCardOwnership(card, ownerId);
+        cardService.checkCardOwnership(card, ownerId);
 
         return cardService.changeCardStatus(card, CardStatus.PENDING_LOCK);
     }
 
-    public void checkCardOwnership(Card card, UUID userId) {
-        if (card.getOwner().getId().equals(userId)) {
-            throw new ForbiddenException("User is not an owner of this card!");
-        }
-    }
 
-    public void checkCardOwnership(UUID cardId, UUID userId) {
-        Card card = cardRepository.findById(cardId).orElseThrow(
-                () -> new NotFoundException("Card not found!"));
-        checkCardOwnership(card, userId);
-    }
 
     @Override
     public Page<CardDto> searchCards(Specification<Card> specification, Pageable pageable) {

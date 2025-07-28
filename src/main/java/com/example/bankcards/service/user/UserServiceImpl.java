@@ -11,7 +11,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 

@@ -1,5 +1,6 @@
 package com.example.bankcards.service.card;
 
+import com.example.bankcards.dto.card.CardCreationDto;
 import com.example.bankcards.dto.card.CardDto;
 import com.example.bankcards.dto.card.CardStatusUpdateDto;
 import com.example.bankcards.entity.Card;
@@ -13,7 +14,6 @@ import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.service.user.UserService;
 import com.example.bankcards.util.AesEncryptionUtil;
 import com.example.bankcards.util.CardNumberUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,19 +23,32 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminCardServiceImpl implements AdminCardService {
     private final static int CARD_CREATION_RETRY_AMOUNT = 5;
     private final static int CARD_CREATION_RETRY_MILLS = 50;
     private final static double CARD_INITIAL_BALANCE = 0.0;
 
-    @Value("${card.validity-period-days}")
-    private final long CARD_TTL;
+    private final long cardTtl;
+
+    public AdminCardServiceImpl(@Value("${app.cards.validity-period-days}") long cardTtl,
+                                CardRepository cardRepository,
+                                AesEncryptionUtil aesEncryptionUtil,
+                                CardMapper cardMapper,
+                                UserService userService,
+                                CardService cardService) {
+        this.cardTtl = cardTtl;
+        this.cardRepository = cardRepository;
+        this.aesEncryptionUtil = aesEncryptionUtil;
+        this.cardMapper = cardMapper;
+        this.userService = userService;
+        this.cardService = cardService;
+    }
 
     private final CardRepository cardRepository;
     private final AesEncryptionUtil aesEncryptionUtil;
@@ -47,8 +60,8 @@ public class AdminCardServiceImpl implements AdminCardService {
     @Retryable(retryFor = CardExistsException.class,
             maxAttempts = CARD_CREATION_RETRY_AMOUNT,
             backoff = @Backoff(delay = CARD_CREATION_RETRY_MILLS))
-    public CardDto createCard(UUID ownerId) {
-        User owner = userService.getEntityById(ownerId);
+    public CardDto createCard(CardCreationDto cardCreationDto) {
+        User owner = userService.getEntityById(cardCreationDto.userId());
 
         String encryptedCardNumber;
 
@@ -68,8 +81,9 @@ public class AdminCardServiceImpl implements AdminCardService {
         Card newCard = cardRepository.save(
                 Card.builder()
                 .owner(owner)
-                .expirationDate(LocalDate.now().plusDays(CARD_TTL))
-                .balance(CARD_INITIAL_BALANCE)
+                .expirationDate(LocalDate.now().plusDays(cardTtl))
+                .balance(BigDecimal.valueOf(CARD_INITIAL_BALANCE))
+                .currency(cardCreationDto.currency())
                 .status(CardStatus.ACTIVE)
                 .encryptedNumber(encryptedCardNumber)
                 .build());
@@ -84,8 +98,7 @@ public class AdminCardServiceImpl implements AdminCardService {
 
     @Override
     public CardDto getCardById(UUID cardId) {
-        return cardMapper.toCardDto(cardRepository.findById(cardId).orElseThrow(
-                () -> new NotFoundException("Card not found!")));
+        return cardMapper.toCardDto(cardService.getEntityById(cardId));
     }
 
     @Override

@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.security.Key;
 
-@Configuration
 @ConfigurationProperties(prefix = "jwt")
 @Getter
 public class JwtProperties {

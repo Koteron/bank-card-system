@@ -20,15 +20,15 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/cards")
+@RequestMapping("/api/cards")
 public class UserCardController {
     private final UserCardService userCardService;
 
     @GetMapping("/search")
     public Page<CardDto> searchCards(
-            @RequestParam(required = false) Double balance,
-            @RequestParam(required = false) Boolean isGreater,
-            @RequestParam(required = false) CardStatus status,
+            @RequestParam(name = "balance", required = false) Double balance,
+            @RequestParam(name = "isGreater", required = false) Boolean isGreater,
+            @RequestParam(name = "status", required = false) CardStatus status,
 
             @PageableDefault(page = 0, size = 5, sort = "balance", direction = Sort.Direction.DESC)
             Pageable pageable,

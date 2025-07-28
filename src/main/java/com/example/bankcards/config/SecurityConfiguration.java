@@ -3,10 +3,10 @@ package com.example.bankcards.config;
 import com.example.bankcards.properties.SecurityProperties;
 import com.example.bankcards.security.JwtAuthenticationEntryPoint;
 import com.example.bankcards.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -57,13 +57,13 @@ public class SecurityConfiguration {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean(name = "customCorsConfigurationSource")
-    public CorsConfigurationSource corsConfigurationSource() {
+    @Bean
+    public CorsConfigurationSource customCorsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*")); // front_end origin
+        config.setAllowedOrigins(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false); // true
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -72,8 +72,8 @@ public class SecurityConfiguration {
 
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterRegistration(
-            @Qualifier("customCorsConfigurationSource") CorsConfigurationSource source) {
-        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+            @Qualifier("customCorsConfigurationSource") CorsConfigurationSource corsConfigurationSource) {
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource));
         bean.setOrder(-102);
         return bean;
     }

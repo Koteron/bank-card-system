@@ -11,6 +11,4 @@ import java.util.UUID;
 public interface UserCardService {
     CardDto requestCardLock(UUID cardId, UUID ownerId);
     Page<CardDto> searchCards(Specification<Card> specification, Pageable pageable);
-    void checkCardOwnership(Card card, UUID ownerId);
-    void checkCardOwnership(UUID cardId, UUID ownerId);
 }

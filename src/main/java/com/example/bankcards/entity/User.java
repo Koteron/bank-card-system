@@ -3,10 +3,7 @@ package com.example.bankcards.entity;
 import com.example.bankcards.entity.util.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -17,7 +14,8 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "users")
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @DynamicInsert
 public class User {
     @Id
@@ -26,16 +24,19 @@ public class User {
     private UUID id;
 
     @NotNull
+    @Column(nullable = false)
     private String nickname;
 
     @NotNull
+    @Column(nullable = false)
     private String email;
 
     @NotNull
-    @Column(name = "password_hash")
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     @NotNull
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
 }

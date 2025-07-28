@@ -1,12 +1,12 @@
 package com.example.bankcards.dto.user;
 
-import lombok.NonNull;
+import jakarta.validation.constraints.NotBlank;
 
 public record OldNewPasswordDto(
-        @NonNull
+        @NotBlank
         String newPassword,
 
-        @NonNull
+        @NotBlank
         String oldPassword
 ) {
 }

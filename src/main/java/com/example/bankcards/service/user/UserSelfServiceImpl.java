@@ -1,5 +1,6 @@
 package com.example.bankcards.service.user;
 
+import com.example.bankcards.dto.user.AuthResponseDto;
 import com.example.bankcards.dto.user.OldNewPasswordDto;
 import com.example.bankcards.dto.user.UserDto;
 import com.example.bankcards.entity.User;
@@ -18,11 +19,11 @@ public class UserSelfServiceImpl implements UserSelfService {
     private final UserRepository userRepository;
     private final PasswordUtil passwordUtil;
     private final UserMapper userMapper;
+    private final AuthService authService;
 
     @Override
     public void changePassword(User user, OldNewPasswordDto oldNewPasswordDto) {
-        if (!passwordUtil.matches(passwordUtil.encrypt(oldNewPasswordDto.oldPassword()),
-                user.getPasswordHash())) {
+        if (!passwordUtil.matches(oldNewPasswordDto.oldPassword(), user.getPasswordHash())) {
             throw new ForbiddenException("Given password does not match the current one");
         }
         user.setPasswordHash(passwordUtil.encrypt(oldNewPasswordDto.newPassword()));
@@ -30,12 +31,12 @@ public class UserSelfServiceImpl implements UserSelfService {
     }
 
     @Override
-    public UserDto changeEmail(User user, String newEmail) {
+    public AuthResponseDto changeEmail(User user, String newEmail) {
         if (userRepository.existsByEmail(newEmail)) {
             throw new ForbiddenException("Email is already in use");
         }
         user.setEmail(newEmail);
-        return userMapper.toUserDto(userRepository.save(user));
+        return userMapper.toAuthResponseDto(userRepository.save(user), authService.generateToken(newEmail));
     }
 
     @Override

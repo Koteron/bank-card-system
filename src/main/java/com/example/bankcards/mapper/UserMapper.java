@@ -4,37 +4,22 @@ import com.example.bankcards.dto.user.AuthResponseDto;
 import com.example.bankcards.dto.user.UserDto;
 import com.example.bankcards.dto.user.UserRegisterDto;
 import com.example.bankcards.entity.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class UserMapper {
 
-    public User toNewUserEntity(UserRegisterDto userRegisterDto, String passwordHash) {
-        return User.builder()
-                .email(userRegisterDto.email())
-                .nickname(userRegisterDto.nickname())
-                .passwordHash(passwordHash)
-                .role(userRegisterDto.role())
-                .build();
-    }
+@Mapper(componentModel = "spring")
+public interface UserMapper {
 
-    public UserDto toUserDto(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .nickname(user.getNickname())
-                .role(user.getRole())
-                .build();
-    }
+    @Mapping(target = "passwordHash", source = "passwordHash")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "nickname", source = "dto.nickname")
+    @Mapping(target = "email", source = "dto.email")
+    @Mapping(target = "role", source = "dto.role")
+    User toNewUserEntity(UserRegisterDto dto, String passwordHash);
 
-    public AuthResponseDto toAuthResponseDto(User user, String token) {
-        return AuthResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .nickname(user.getNickname())
-                .role(user.getRole())
-                .token(token)
-                .build();
-    }
+    UserDto toUserDto(User user);
 
+    @Mapping(target = "token", source = "token")
+    AuthResponseDto toAuthResponseDto(User user, String token);
 }

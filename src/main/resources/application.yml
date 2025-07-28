@@ -2,12 +2,6 @@ server:
   port: 8080
 
 spring:
-  datasource:
-    url: ${POSTGRES_URL}
-    username: ${POSTGRES_USERNAME}
-    password: ${POSTGRES_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: validate
@@ -22,6 +16,9 @@ spring:
     change-log: classpath:/db/changelog-master.yaml
     drop-first: false
 
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -31,11 +28,29 @@ springdoc:
 
 jwt:
   secret-key: ${JWT_SECRET}
-  expiration: 3600000
+  expiration: 360000000
+
+aes:
+  secret-key: ${AES_SECRET}
 
 security:
   unauthenticated-endpoints:
-    - /auth/login
-    - /auth/register
-card:
-  validity-period-days: 1825 # 5 years
+    - /api/auth/login
+    - /api/auth/register
+
+app:
+  cards:
+    validity-period-days: 1825 # 5 years
+    validity-check-cron: "0 0 0 * * *"
+  currencies:
+    default: RUB
+    rates:
+      USD:
+        RUB: 90.50
+        EUR: 0.92
+      EUR:
+        RUB: 98.20
+        USD: 1.09
+      RUB:
+        USD: 0.011
+        EUR: 0.010

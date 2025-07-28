@@ -42,8 +42,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(userLoginDto.email())
                 .orElseThrow(() -> new NotFoundException("User not found!"));
         if (passwordUtil.matches(userLoginDto.password(), user.getPasswordHash())) {
-            return userMapper.toAuthResponseDto(user, jwtTokenProvider.generateToken(user.getEmail()));
+            return userMapper.toAuthResponseDto(user, generateToken(user.getEmail()));
         }
         throw new UnauthorizedException("Wrong password!");
+    }
+
+    public String generateToken(String email) {
+        return jwtTokenProvider.generateToken(email);
     }
 }

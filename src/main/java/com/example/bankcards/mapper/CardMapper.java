@@ -5,29 +5,30 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.exception.SystemErrorException;
 import com.example.bankcards.util.AesEncryptionUtil;
 import com.example.bankcards.util.CardNumberUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Component
-@RequiredArgsConstructor
-public class CardMapper {
-    private final AesEncryptionUtil aesEncryptionUtil;
+@Mapper(componentModel = "spring")
+public abstract class CardMapper {
 
-    public CardDto toCardDto(Card card) {
-        String decryptedCardNumber;
+    protected AesEncryptionUtil aesEncryptionUtil;
+
+    @Autowired
+    public void setAesEncryptionUtil(AesEncryptionUtil aesEncryptionUtil) {
+        this.aesEncryptionUtil = aesEncryptionUtil;
+    }
+
+    @Mapping(target = "maskedNumber", expression = "java(getMaskedNumber(card.getEncryptedNumber()))")
+    @Mapping(target = "ownerId", source = "owner.id")
+    public abstract CardDto toCardDto(Card card);
+
+    protected String getMaskedNumber(String encryptedNumber) {
         try {
-            decryptedCardNumber = aesEncryptionUtil.decrypt(card.getEncryptedNumber());
-        }
-        catch (Exception e) {
+            String decrypted = aesEncryptionUtil.decrypt(encryptedNumber);
+            return CardNumberUtil.maskCardNumber(decrypted);
+        } catch (Exception e) {
             throw new SystemErrorException(e.getMessage());
         }
-        return CardDto.builder()
-                .id(card.getId())
-                .balance(card.getBalance())
-                .maskedNumber(CardNumberUtil.maskCardNumber(decryptedCardNumber))
-                .expirationDate(card.getExpirationDate())
-                .ownerId(card.getOwner().getId())
-                .status(card.getStatus())
-                .build();
     }
 }

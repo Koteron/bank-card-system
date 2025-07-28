@@ -1,11 +1,14 @@
 package com.example.bankcards.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -17,9 +20,9 @@ public class AesEncryptionUtil {
 
     private final SecretKey secretKey;
 
-    public AesEncryptionUtil(String base64Key) {
-        byte[] decoded = Base64.getDecoder().decode(base64Key);
-        this.secretKey = new SecretKeySpec(decoded, 0, decoded.length, "AES");
+    public AesEncryptionUtil(@Value("${aes.secret-key}") String base64Key) {
+        byte[] keyBytes = Base64.getDecoder().decode(base64Key);
+        this.secretKey = new SecretKeySpec(keyBytes, "AES");
     }
 
     public String encrypt(String plainText) throws Exception {

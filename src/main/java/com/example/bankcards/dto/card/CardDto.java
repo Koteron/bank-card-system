@@ -1,9 +1,12 @@
 package com.example.bankcards.dto.card;
 
 import com.example.bankcards.entity.util.CardStatus;
+import com.example.bankcards.entity.util.Currency;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Digits;
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -22,6 +25,9 @@ public record CardDto(
 
         CardStatus status,
 
-        double balance
+        Currency currency,
+
+        @Digits(integer = 19, fraction = 2)
+        BigDecimal balance
 ) {
 }

@@ -1,5 +1,6 @@
 package com.example.bankcards.controller.card;
 
+import com.example.bankcards.dto.card.CardCreationDto;
 import com.example.bankcards.dto.card.CardDto;
 import com.example.bankcards.dto.card.CardStatusUpdateDto;
 import com.example.bankcards.entity.Card;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/admin/cards")
+@RequestMapping("/api/admin/cards")
 @RequiredArgsConstructor
 public class AdminCardController {
 
@@ -27,10 +28,10 @@ public class AdminCardController {
 
     @GetMapping("/search")
     public Page<CardDto> searchCards(
-            @RequestParam(required = false) Double balance,
-            @RequestParam(required = false) Boolean isGreater,
-            @RequestParam(required = false) UUID ownerId,
-            @RequestParam(required = false) CardStatus status,
+            @RequestParam(name = "balance", required = false) Double balance,
+            @RequestParam(name = "isGreater", required = false) Boolean isGreater,
+            @RequestParam(name = "ownerId", required = false) UUID ownerId,
+            @RequestParam(name = "status", required = false) CardStatus status,
 
             @PageableDefault(page = 0, size = 5, sort = "balance", direction = Sort.Direction.DESC)
             Pageable pageable
@@ -48,9 +49,10 @@ public class AdminCardController {
         return adminCardService.getCardById(id);
     }
 
-    @PostMapping("/create/{owner-id}")
-    public CardDto createCard(@PathVariable("owner-id") UUID ownerId) {
-        return adminCardService.createCard(ownerId);
+    @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CardDto createCard(@RequestBody CardCreationDto cardCreationDto) {
+        return adminCardService.createCard(cardCreationDto);
     }
 
     @DeleteMapping("/delete/{id}")

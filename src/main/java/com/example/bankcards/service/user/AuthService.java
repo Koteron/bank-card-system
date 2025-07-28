@@ -7,6 +7,6 @@ import com.example.bankcards.dto.user.UserRegisterDto;
 public interface AuthService {
 
     AuthResponseDto register(UserRegisterDto userRegisterDto);
-
+    String generateToken(String email);
     AuthResponseDto login(UserLoginDto userLoginDto);
 }

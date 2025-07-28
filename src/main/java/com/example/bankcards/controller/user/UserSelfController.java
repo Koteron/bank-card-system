@@ -1,7 +1,6 @@
 package com.example.bankcards.controller.user;
 
-import com.example.bankcards.dto.user.OldNewPasswordDto;
-import com.example.bankcards.dto.user.UserDto;
+import com.example.bankcards.dto.user.*;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.security.UserDetailsImpl;
 import com.example.bankcards.service.user.UserSelfService;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserSelfController {
     private final UserSelfService userSelfService;
 
@@ -26,21 +25,24 @@ public class UserSelfController {
     }
 
     @PatchMapping("/update/email")
-    public UserDto changeEmail(
-            @AuthenticationPrincipal User user,
-            @RequestParam String email) {
-        return userSelfService.changeEmail(user, email);
+    public AuthResponseDto changeEmail(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody @Valid ChangeEmailDto dto
+    ) {
+        return userSelfService.changeEmail(userDetails.getUser(), dto.newEmail());
     }
 
     @PatchMapping("/update/nickname")
     public UserDto changeNickname(
-            @AuthenticationPrincipal User user,
-            @RequestParam String firstName) {
-        return userSelfService.changeNickname(user, firstName);
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody @Valid ChangeNicknameDto dto
+    ) {
+        return userSelfService.changeNickname(userDetails.getUser(), dto.newNickname());
     }
 
     @DeleteMapping
-    public void deleteUser(@AuthenticationPrincipal User user) {
-        userSelfService.deleteUser(user);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userSelfService.deleteUser(userDetails.getUser());
     }
 }

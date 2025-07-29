@@ -9,4 +9,5 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+app.log
 target

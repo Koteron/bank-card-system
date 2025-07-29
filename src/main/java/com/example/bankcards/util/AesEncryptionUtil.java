@@ -10,6 +10,12 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * Utility class for AES encryption and decryption using CBC mode with PKCS5 padding.
+ * <p>
+ * The secret key must be provided as a base64-encoded string via the `aes.secret-key` property.
+ * Each encryption generates a new random IV and prepends it to the resulting ciphertext.
+ */
 @Component
 public class AesEncryptionUtil {
 
@@ -23,6 +29,13 @@ public class AesEncryptionUtil {
         this.secretKey = new SecretKeySpec(keyBytes, "AES");
     }
 
+    /**
+     * Encrypts the given plaintext using AES/CBC/PKCS5Padding with a random IV.
+     *
+     * @param plainText the string to encrypt
+     * @return a base64-encoded string containing the IV and ciphertext
+     * @throws Exception if encryption fails
+     */
     public String encrypt(String plainText) throws Exception {
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         byte[] iv = new byte[IV_LENGTH];
@@ -41,6 +54,13 @@ public class AesEncryptionUtil {
         return Base64.getEncoder().encodeToString(ivAndCipher);
     }
 
+    /**
+     * Decrypts a base64-encoded string that contains both the IV and the encrypted data.
+     *
+     * @param base64IvAndCipher base64 string containing the IV and ciphertext
+     * @return the original plaintext
+     * @throws Exception if decryption fails
+     */
     public String decrypt(String base64IvAndCipher) throws Exception {
         byte[] ivAndCipher = Base64.getDecoder().decode(base64IvAndCipher);
 

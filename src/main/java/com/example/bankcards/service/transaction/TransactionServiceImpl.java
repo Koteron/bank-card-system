@@ -6,6 +6,7 @@ import com.example.bankcards.dto.transaction.TransferRequestDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Transaction;
 import com.example.bankcards.entity.User;
+import com.example.bankcards.entity.util.CardStatus;
 import com.example.bankcards.entity.util.TransactionType;
 import com.example.bankcards.exception.ForbiddenException;
 import com.example.bankcards.repository.TransactionRepository;
@@ -37,6 +38,11 @@ public class TransactionServiceImpl implements TransactionService {
         else {
             cardFrom = cardService.getEntityByCardNumber(transferRequestDto.cardFromNumber());
         }
+
+        if (!cardFrom.getStatus().equals(CardStatus.ACTIVE))
+        {
+            throw new ForbiddenException("From-Card is not active");
+        }
         cardService.checkCardOwnership(cardFrom, user.getId());
 
         Card cardTo;
@@ -46,8 +52,12 @@ public class TransactionServiceImpl implements TransactionService {
         else {
             cardTo = cardService.getEntityByCardNumber(transferRequestDto.cardToNumber());
         }
-        cardService.checkCardOwnership(cardTo, user.getId());
 
+        if (!cardFrom.getStatus().equals(CardStatus.ACTIVE))
+        {
+            throw new ForbiddenException("To-Card is not active");
+        }
+        cardService.checkCardOwnership(cardTo, user.getId());
         if (cardFrom.getBalance().compareTo(transferRequestDto.amount()) < 0) {
             throw new ForbiddenException("Insufficient balance");
         }
@@ -87,6 +97,11 @@ public class TransactionServiceImpl implements TransactionService {
         else {
             card = cardService.getEntityByCardNumber(oneCardOperationDto.cardNumber());
         }
+
+        if (!card.getStatus().equals(CardStatus.ACTIVE))
+        {
+            throw new ForbiddenException("Card is not active");
+        }
         cardService.checkCardOwnership(card, user.getId());
 
         BigDecimal convertedAmount = currencyService.convert(
@@ -122,8 +137,12 @@ public class TransactionServiceImpl implements TransactionService {
         else {
             card = cardService.getEntityByCardNumber(oneCardOperationDto.cardNumber());
         }
-        cardService.checkCardOwnership(card, user.getId());
 
+        if (!card.getStatus().equals(CardStatus.ACTIVE))
+        {
+            throw new ForbiddenException("Card is not active");
+        }
+        cardService.checkCardOwnership(card, user.getId());
         if (card.getBalance().compareTo(oneCardOperationDto.amount()) < 0) {
             throw new ForbiddenException("Insufficient balance");
         }

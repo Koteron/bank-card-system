@@ -26,7 +26,10 @@ public class UserCardServiceImpl implements UserCardService {
     public CardDto requestCardLock(UUID cardId, UUID ownerId) {
         Card card = cardRepository.findById(cardId).orElseThrow(
                 () -> new NotFoundException("Card not found!"));
-
+        if (!card.getStatus().equals(CardStatus.ACTIVE))
+        {
+            throw new ForbiddenException("Card is not active");
+        }
         cardService.checkCardOwnership(card, ownerId);
 
         return cardService.changeCardStatus(card, CardStatus.PENDING_LOCK);

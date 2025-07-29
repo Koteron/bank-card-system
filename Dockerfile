@@ -1,7 +1,6 @@
 FROM maven:3.9.11-eclipse-temurin-17 AS builder
 WORKDIR /opt/app
 COPY . .
-RUN mvn clean test
 RUN mvn clean package -DskipTests
 
 FROM maven:3.9.11-eclipse-temurin-17

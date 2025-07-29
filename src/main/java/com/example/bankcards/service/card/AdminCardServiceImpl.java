@@ -75,7 +75,7 @@ public class AdminCardServiceImpl implements AdminCardService {
 
         if (cardRepository.existsByEncryptedNumber(encryptedCardNumber))
         {
-            throw new CardExistsException("Card already exists!");
+            throw new CardExistsException("Failed to generate a unique card number");
         }
 
         Card newCard = cardRepository.save(

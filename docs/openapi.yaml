@@ -1,1 +1,1259 @@
-# Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+openapi: 3.0.1
+info:
+  title: Bank API
+  description: Bankcard API made as a test task
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+security:
+  - bearerAuth: []
+tags:
+  - name: Admin - Cards
+    description: Admin operations for cards
+paths:
+  /api/transactions/withdraw:
+    post:
+      tags:
+        - Transactions
+      summary: Withdraw money to user's card
+      description: Withdraws money from user's card with currency conversion
+      operationId: withdraw
+      requestBody:
+        description: Parameters needed for one card operation
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OneCardOperationDto"
+        required: true
+      responses:
+        "200":
+          description: Card with updated balance returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "401":
+          description: User is not authorized for the action
+        "403":
+          description: Card is not active or user is not an owner of the card
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Card not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/transactions/transfer:
+    post:
+      tags:
+        - Transactions
+      summary: Transfer money from one user's card to another
+      description: Transfers money from card to card with currency conversion
+      operationId: transfer
+      requestBody:
+        description: Transfer parameters
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Card with updated balance returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "401":
+          description: User is not authorized for the action
+        "403":
+          description: One of the cards is not active or user is not an owner of the
+            card
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: One of the cards not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/transactions/deposit:
+    post:
+      tags:
+        - Transactions
+      summary: Deposit money to user's card
+      description: Deposits money to user's card with currency conversion
+      operationId: deposit
+      requestBody:
+        description: Parameters needed for one card operation
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OneCardOperationDto"
+        required: true
+      responses:
+        "200":
+          description: Card with updated balance returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "401":
+          description: User is not authorized for the action
+        "403":
+          description: Card is not active or user is not an owner of the card
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Card not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a user
+      description: Registers user with given credentials and send it back with jwt-token
+      operationId: register
+      requestBody:
+        description: User creation parameters
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegisterDto"
+        required: true
+      responses:
+        "201":
+          description: User was created and returned along with jwt token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponseDto"
+        "403":
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login a user
+      description: Logs user in by given credentials and send it back with jwt-token
+      operationId: login
+      requestBody:
+        description: User login parameters
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginDto"
+        required: true
+      responses:
+        "200":
+          description: User was logged in and returned along with jwt token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponseDto"
+        "404":
+          description: User with given credentials not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/admin/cards/create:
+    post:
+      tags:
+        - Admin - Cards
+      summary: Create card
+      description: Creates a card with given currency for given user
+      operationId: createCard
+      requestBody:
+        description: Card creation parameters
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardCreationDto"
+        required: true
+      responses:
+        "200":
+          description: Card was created and returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CardDto"
+  /api/user/update/password:
+    patch:
+      tags:
+        - User - Self
+      summary: Change password
+      description: Changes user's password and checks the old given one
+      operationId: changePassword
+      requestBody:
+        description: Old and new password
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginDto"
+        required: true
+      responses:
+        "204":
+          description: Password was changed
+        "401":
+          description: User is not authorized for the action
+        "403":
+          description: Given old password is invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/user/update/nickname:
+    patch:
+      tags:
+        - User - Self
+      summary: Change nickname
+      description: Changes user's nickname
+      operationId: changeNickname
+      requestBody:
+        description: New nickname
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginDto"
+        required: true
+      responses:
+        "200":
+          description: Nickname was changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/user/update/email:
+    patch:
+      tags:
+        - User - Self
+      summary: Change email
+      description: Changes user's email and checks it for uniqueness
+      operationId: changeEmail
+      requestBody:
+        description: New email
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginDto"
+        required: true
+      responses:
+        "200":
+          description: Email was changed. Auth response was returned to refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponseDto"
+        "401":
+          description: User is not authorized for the action
+        "403":
+          description: Email is already in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/cards/lock/{card-id}:
+    patch:
+      tags:
+        - User - Cards
+      summary: Request card lock
+      description: Changes card status to "PENDING_LOCK" to be later locked by admin
+      operationId: requestCardLock
+      parameters:
+        - name: card-id
+          in: path
+          description: UUID of the card
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "200":
+          description: Card's status was changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "401":
+          description: User is not authorized for the action
+        "403":
+          description: Card is not active or user is not an owner of the card
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Card not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/admin/users/{user-id}:
+    get:
+      tags:
+        - Admin - Users
+      summary: Get a user
+      description: Returns the user with given id
+      operationId: getUserById
+      parameters:
+        - name: user-id
+          in: path
+          description: UUID of the user
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "200":
+          description: User was returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "401":
+          description: User is not authorized for the action
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+        - Admin - Users
+      summary: Delete a user
+      description: Deletes user with given id
+      operationId: deleteUserById
+      parameters:
+        - name: user-id
+          in: path
+          description: UUID of the user
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "204":
+          description: User was deleted
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      tags:
+        - Admin - Users
+      summary: Make user an admin
+      description: Changes the role of a given user to admin
+      operationId: makeAdmin
+      parameters:
+        - name: user-id
+          in: path
+          description: UUID of the user
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "204":
+          description: User role was changed to admin
+        "401":
+          description: User is not authorized for the action
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/admin/cards/status:
+    patch:
+      tags:
+        - Admin - Cards
+      summary: Update card status
+      description: Changes status of the card with given id to a desired one
+      operationId: updateCardStatus
+      requestBody:
+        description: Card status update parameters
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardStatusUpdateDto"
+        required: true
+      responses:
+        "200":
+          description: Card's status was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "401":
+          description: User is not authorized for the action
+        "404":
+          description: Card with given id not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/cards/search:
+    get:
+      tags:
+        - User - Cards
+      summary: Search cards with optional filters
+      description: "Returns a paginated list of cards based on optional filters: balance,\
+        \ comparison type, owner ID, and status"
+      operationId: searchCards
+      parameters:
+        - name: balance
+          in: query
+          description: Balance to compare
+          required: false
+          schema:
+            type: number
+            format: double
+          example: 1000.0
+        - name: isGreater
+          in: query
+          description: Whether balance should be greater than the given value (true/false)
+          required: false
+          schema:
+            type: boolean
+          example: true
+        - name: status
+          in: query
+          description: Card status to filter by
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - LOCKED
+              - EXPIRED
+              - PENDING_LOCK
+      responses:
+        "200":
+          description: Card's pagination was returned successfully filled with CardDtos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/admin/users:
+    get:
+      tags:
+        - Admin - Users
+      summary: Get the list of users
+      description: Returns all existing users
+      operationId: getUsers
+      responses:
+        "200":
+          description: List of UserDtos was returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/admin/cards/search:
+    get:
+      tags:
+        - Admin - Cards
+      summary: Search cards with optional filters
+      description: "Returns a paginated list of cards based on optional filters: balance,\
+        \ comparison type, owner ID, and status"
+      operationId: searchCards_1
+      parameters:
+        - name: balance
+          in: query
+          description: Balance to compare
+          required: false
+          schema:
+            type: number
+            format: double
+          example: 1000.0
+        - name: isGreater
+          in: query
+          description: Whether balance should be greater than the given value (true/false)
+          required: false
+          schema:
+            type: boolean
+          example: true
+        - name: ownerId
+          in: query
+          description: UUID of the card owner
+          required: false
+          schema:
+            type: string
+            format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        - name: status
+          in: query
+          description: Card status to filter by
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - LOCKED
+              - EXPIRED
+              - PENDING_LOCK
+      responses:
+        "200":
+          description: Card's pagination was returned successfully filled with CardDtos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/admin/cards/get/{id}:
+    get:
+      tags:
+        - Admin - Cards
+      summary: Get card by id
+      description: Returns card dto with given id
+      operationId: getCardById
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the card
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "200":
+          description: Card was found and returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/user:
+    delete:
+      tags:
+        - User - Self
+      summary: Delete account
+      description: Deletes user's account
+      operationId: deleteUser
+      responses:
+        "204":
+          description: User was deleted
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/admin/cards/delete/{id}:
+    delete:
+      tags:
+        - Admin - Cards
+      summary: Delete card by id
+      description: Deletes card with given id
+      operationId: deleteCard
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the card
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "204":
+          description: Card was deleted
+        "401":
+          description: User is not authorized for the action
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    OneCardOperationDto:
+      required:
+        - currency
+      type: object
+      properties:
+        cardId:
+          type: string
+          format: uuid
+        cardNumber:
+          maxLength: 19
+          minLength: 16
+          type: string
+        currency:
+          type: string
+          enum:
+            - RUB
+            - USD
+            - EUR
+        amount:
+          type: number
+    CardDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - LOCKED
+            - EXPIRED
+            - PENDING_LOCK
+        currency:
+          type: string
+          enum:
+            - RUB
+            - USD
+            - EUR
+        balance:
+          type: number
+        masked_number:
+          type: string
+        owner_id:
+          type: string
+          format: uuid
+        expiration_date:
+          type: string
+          format: date
+    ContentDisposition:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        filename:
+          type: string
+        charset:
+          type: string
+        size:
+          type: integer
+          format: int64
+          deprecated: true
+        creationDate:
+          type: string
+          format: date-time
+          deprecated: true
+        modificationDate:
+          type: string
+          format: date-time
+          deprecated: true
+        readDate:
+          type: string
+          format: date-time
+          deprecated: true
+        attachment:
+          type: boolean
+        formData:
+          type: boolean
+        inline:
+          type: boolean
+    ErrorResponse:
+      type: object
+      properties:
+        body:
+          $ref: "#/components/schemas/ProblemDetail"
+        headers:
+          type: object
+          properties:
+            connection:
+              type: array
+              items:
+                type: string
+            contentDisposition:
+              $ref: "#/components/schemas/ContentDisposition"
+            acceptCharset:
+              type: array
+              items:
+                type: string
+            location:
+              type: string
+              format: uri
+            empty:
+              type: boolean
+            host:
+              type: object
+              properties:
+                hostString:
+                  type: string
+                address:
+                  type: object
+                  properties:
+                    hostAddress:
+                      type: string
+                    address:
+                      type: array
+                      items:
+                        type: string
+                        format: byte
+                    hostName:
+                      type: string
+                    linkLocalAddress:
+                      type: boolean
+                    multicastAddress:
+                      type: boolean
+                    anyLocalAddress:
+                      type: boolean
+                    loopbackAddress:
+                      type: boolean
+                    siteLocalAddress:
+                      type: boolean
+                    mcglobal:
+                      type: boolean
+                    mcnodeLocal:
+                      type: boolean
+                    mclinkLocal:
+                      type: boolean
+                    mcsiteLocal:
+                      type: boolean
+                    mcorgLocal:
+                      type: boolean
+                    canonicalHostName:
+                      type: string
+                port:
+                  type: integer
+                  format: int32
+                unresolved:
+                  type: boolean
+                hostName:
+                  type: string
+            all:
+              type: object
+              additionalProperties:
+                type: string
+              writeOnly: true
+            lastModified:
+              type: integer
+              format: int64
+            date:
+              type: integer
+              format: int64
+            contentLength:
+              type: integer
+              format: int64
+            contentType:
+              $ref: "#/components/schemas/MediaType"
+            ifModifiedSince:
+              type: integer
+              format: int64
+            origin:
+              type: string
+            range:
+              type: array
+              items:
+                $ref: "#/components/schemas/HttpRange"
+            allow:
+              uniqueItems: true
+              type: array
+              items:
+                $ref: "#/components/schemas/HttpMethod"
+            cacheControl:
+              type: string
+            contentLanguage:
+              type: object
+              properties:
+                language:
+                  type: string
+                displayName:
+                  type: string
+                country:
+                  type: string
+                variant:
+                  type: string
+                script:
+                  type: string
+                unicodeLocaleAttributes:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                unicodeLocaleKeys:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                displayLanguage:
+                  type: string
+                displayScript:
+                  type: string
+                displayCountry:
+                  type: string
+                displayVariant:
+                  type: string
+                extensionKeys:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                iso3Language:
+                  type: string
+                iso3Country:
+                  type: string
+            etag:
+              type: string
+            accessControlAllowOrigin:
+              type: string
+            accessControlAllowMethods:
+              type: array
+              items:
+                $ref: "#/components/schemas/HttpMethod"
+            accessControlAllowHeaders:
+              type: array
+              items:
+                type: string
+            accessControlExposeHeaders:
+              type: array
+              items:
+                type: string
+            accessControlAllowCredentials:
+              type: boolean
+            accessControlMaxAge:
+              type: integer
+              format: int64
+            accessControlRequestMethod:
+              $ref: "#/components/schemas/HttpMethod"
+            accessControlRequestHeaders:
+              type: array
+              items:
+                type: string
+            accept:
+              type: array
+              items:
+                $ref: "#/components/schemas/MediaType"
+            acceptLanguageAsLocales:
+              type: array
+              items:
+                type: object
+                properties:
+                  language:
+                    type: string
+                  displayName:
+                    type: string
+                  country:
+                    type: string
+                  variant:
+                    type: string
+                  script:
+                    type: string
+                  unicodeLocaleAttributes:
+                    uniqueItems: true
+                    type: array
+                    items:
+                      type: string
+                  unicodeLocaleKeys:
+                    uniqueItems: true
+                    type: array
+                    items:
+                      type: string
+                  displayLanguage:
+                    type: string
+                  displayScript:
+                    type: string
+                  displayCountry:
+                    type: string
+                  displayVariant:
+                    type: string
+                  extensionKeys:
+                    uniqueItems: true
+                    type: array
+                    items:
+                      type: string
+                  iso3Language:
+                    type: string
+                  iso3Country:
+                    type: string
+            acceptPatch:
+              type: array
+              items:
+                $ref: "#/components/schemas/MediaType"
+            bearerAuth:
+              type: string
+              writeOnly: true
+            expires:
+              type: integer
+              format: int64
+            ifMatch:
+              type: array
+              items:
+                type: string
+            ifNoneMatch:
+              type: array
+              items:
+                type: string
+            ifUnmodifiedSince:
+              type: integer
+              format: int64
+            pragma:
+              type: string
+            upgrade:
+              type: string
+            vary:
+              type: array
+              items:
+                type: string
+            acceptLanguage:
+              type: array
+              items:
+                type: object
+                properties:
+                  range:
+                    type: string
+                  weight:
+                    type: number
+                    format: double
+            basicAuth:
+              type: string
+              writeOnly: true
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        statusCode:
+          $ref: "#/components/schemas/HttpStatusCode"
+        typeMessageCode:
+          type: string
+        detailMessageCode:
+          type: string
+        detailMessageArguments:
+          type: array
+          items:
+            type: object
+        titleMessageCode:
+          type: string
+    HttpMethod:
+      type: object
+    HttpRange:
+      type: object
+    HttpStatusCode:
+      type: object
+      properties:
+        is4xxClientError:
+          type: boolean
+        error:
+          type: boolean
+        is5xxServerError:
+          type: boolean
+        is1xxInformational:
+          type: boolean
+        is2xxSuccessful:
+          type: boolean
+        is3xxRedirection:
+          type: boolean
+    MediaType:
+      type: object
+      properties:
+        type:
+          type: string
+        subtype:
+          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+        qualityValue:
+          type: number
+          format: double
+        wildcardType:
+          type: boolean
+        wildcardSubtype:
+          type: boolean
+        subtypeSuffix:
+          type: string
+        charset:
+          type: string
+        concrete:
+          type: boolean
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        properties:
+          type: object
+          additionalProperties:
+            type: object
+    TransferRequestDto:
+      type: object
+      properties:
+        cardFromId:
+          type: string
+          format: uuid
+        cardFromNumber:
+          maxLength: 19
+          minLength: 16
+          type: string
+        cardToId:
+          type: string
+          format: uuid
+        cardToNumber:
+          maxLength: 19
+          minLength: 16
+          type: string
+        amount:
+          type: number
+    UserRegisterDto:
+      required:
+        - email
+        - nickname
+        - password
+      type: object
+      properties:
+        nickname:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+    AuthResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nickname:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+        token:
+          type: string
+    UserLoginDto:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    CardCreationDto:
+      required:
+        - currency
+        - user_id
+      type: object
+      properties:
+        currency:
+          type: string
+          enum:
+            - RUB
+            - USD
+            - EUR
+        user_id:
+          type: string
+          format: uuid
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nickname:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+    CardStatusUpdateDto:
+      required:
+        - card_id
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - LOCKED
+            - EXPIRED
+            - PENDING_LOCK
+        card_id:
+          type: string
+          format: uuid
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

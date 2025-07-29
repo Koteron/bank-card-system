@@ -22,9 +22,24 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-    operationsSorter: method
-  api-docs:
-    path: /docs
+    operations-sorter: method
+  group-configs:
+    - group: everything
+      paths-to-match: /api/**
+      display-name: All API
+
+    - group: admin
+      paths-to-match: /api/admin/**
+      display-name: Admin API
+
+    - group: user
+      paths-to-match: /api/**
+      paths-to-exclude: /api/admin/**
+      display-name: User API
+
+    - group: unauthenticated user
+      paths-to-match: /api/auth/**
+      display-name: Unauthenticated User API
 
 jwt:
   secret-key: ${JWT_SECRET}
@@ -37,6 +52,9 @@ security:
   unauthenticated-endpoints:
     - /api/auth/login
     - /api/auth/register
+    - /swagger-ui.html
+    - /swagger-ui/**
+    - /v3/**
 
 app:
   cards:

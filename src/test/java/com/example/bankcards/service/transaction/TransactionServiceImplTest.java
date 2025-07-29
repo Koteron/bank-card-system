@@ -1,5 +1,6 @@
 package com.example.bankcards.service.transaction;
 
+import com.example.bankcards.entity.util.CardStatus;
 import com.example.bankcards.dto.card.CardDto;
 import com.example.bankcards.dto.transaction.OneCardOperationDto;
 import com.example.bankcards.dto.transaction.TransferRequestDto;
@@ -57,15 +58,26 @@ class TransactionServiceImplTest {
         cardFrom.setOwner(user);
         cardFrom.setBalance(new BigDecimal("100.00"));
         cardFrom.setCurrency(Currency.USD);
+        cardFrom.setStatus(CardStatus.ACTIVE);
 
         cardTo = new Card();
         cardTo.setId(UUID.randomUUID());
         cardTo.setOwner(user);
         cardTo.setBalance(new BigDecimal("50.00"));
         cardTo.setCurrency(Currency.EUR);
+        cardTo.setStatus(CardStatus.ACTIVE);
 
-        cardDtoFrom = CardDto.builder().build();
-        cardDtoTo = CardDto.builder().build();
+        cardDtoFrom = CardDto.builder()
+                .id(cardFrom.getId())
+                .balance(cardFrom.getBalance())
+                .currency(cardFrom.getCurrency())
+                .build();
+
+        cardDtoTo = CardDto.builder()
+                .id(cardTo.getId())
+                .balance(cardTo.getBalance())
+                .currency(cardTo.getCurrency())
+                .build();
     }
 
     @Test

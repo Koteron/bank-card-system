@@ -50,6 +50,7 @@ class UserCardServiceImplTest {
         card.setId(cardId);
         card.setOwner(new com.example.bankcards.entity.User());
         card.getOwner().setId(ownerId);
+        card.setStatus(CardStatus.ACTIVE);
         cardDto = CardDto.builder().build();
     }
 

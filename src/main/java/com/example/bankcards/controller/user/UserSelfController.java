@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.ErrorResponse;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 @Tag(name = "User - Self")
 public class UserSelfController {
+    private static final Logger log = LoggerFactory.getLogger(UserSelfController.class);
     private final UserSelfService userSelfService;
 
     @Operation(
@@ -56,6 +59,7 @@ public class UserSelfController {
     public void changePassword(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody @Valid OldNewPasswordDto oldNewPasswordDto) {
+        log.debug("Request received: Change password of user with email {}", userDetails.getUser().getEmail());
         userSelfService.changePassword(userDetails.getUser(), oldNewPasswordDto);
     }
 
@@ -96,6 +100,7 @@ public class UserSelfController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody @Valid ChangeEmailDto dto
     ) {
+        log.debug("Request received: Change email of user with email {}", userDetails.getUser().getEmail());
         return userSelfService.changeEmail(userDetails.getUser(), dto.newEmail());
     }
 
@@ -130,6 +135,7 @@ public class UserSelfController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody @Valid ChangeNicknameDto dto
     ) {
+        log.debug("Request received: Change nickname of user with email {}", userDetails.getUser().getEmail());
         return userSelfService.changeNickname(userDetails.getUser(), dto.newNickname());
     }
 
@@ -154,6 +160,7 @@ public class UserSelfController {
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.debug("Request received: Delete account of user with email {}", userDetails.getUser().getEmail());
         userSelfService.deleteUser(userDetails.getUser());
     }
 }

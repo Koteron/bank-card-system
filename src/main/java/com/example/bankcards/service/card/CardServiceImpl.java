@@ -5,7 +5,7 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.util.CardStatus;
 import com.example.bankcards.exception.ForbiddenException;
 import com.example.bankcards.exception.NotFoundException;
-import com.example.bankcards.exception.SystemErrorException;
+import com.example.bankcards.exception.InternalServerErrorException;
 import com.example.bankcards.mapper.CardMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.util.AesEncryptionUtil;
@@ -54,7 +54,7 @@ public class CardServiceImpl implements CardService {
             encryptedNumber = aesEncryptionUtil.encrypt(cardNumber);
         }
         catch (Exception e) {
-            throw new SystemErrorException(e.getMessage());
+            throw new InternalServerErrorException(e.getMessage());
         }
         return cardRepository.findByEncryptedNumber(encryptedNumber).orElseThrow(
                 () -> new NotFoundException("Card not found!"));

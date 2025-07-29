@@ -5,7 +5,7 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.util.CardStatus;
 import com.example.bankcards.exception.ForbiddenException;
 import com.example.bankcards.exception.NotFoundException;
-import com.example.bankcards.exception.SystemErrorException;
+import com.example.bankcards.exception.InternalServerErrorException;
 import com.example.bankcards.mapper.CardMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.util.AesEncryptionUtil;
@@ -141,7 +141,7 @@ class CardServiceImplTest {
         String number = "1234";
         when(aesEncryptionUtil.encrypt(number)).thenThrow(new RuntimeException("fail"));
 
-        assertThrows(SystemErrorException.class, () -> cardService.getEntityByCardNumber(number));
+        assertThrows(InternalServerErrorException.class, () -> cardService.getEntityByCardNumber(number));
         verify(aesEncryptionUtil).encrypt(number);
     }
 

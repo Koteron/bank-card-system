@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @RequestMapping("/api/admin/users")
 @Tag(name = "Admin - Users")
 public class AdminUserController {
+    private static final Logger log = LoggerFactory.getLogger(AdminUserController.class);
     private final AdminUserService adminUserService;
 
     @Operation(
@@ -48,6 +51,7 @@ public class AdminUserController {
                     example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("user-id") UUID userId
     ) {
+        log.debug("Admin request received: Delete user with id: {}", userId);
         adminUserService.deleteUserById(userId);
     }
 
@@ -84,6 +88,7 @@ public class AdminUserController {
                     example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("user-id") UUID userId
     ) {
+        log.debug("Admin request received: Get user with id: {}", userId);
         return adminUserService.getUserById(userId);
     }
 
@@ -118,6 +123,7 @@ public class AdminUserController {
                     example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("user-id") UUID userId
     ) {
+        log.debug("Admin request received: Make user with id {} an admin", userId);
         adminUserService.makeAdmin(userId);
     }
 
@@ -144,6 +150,7 @@ public class AdminUserController {
     )
     @GetMapping
     public List<UserDto> getUsers() {
+        log.debug("Admin request received: Get user list");
         return adminUserService.getUsers();
     }
 }

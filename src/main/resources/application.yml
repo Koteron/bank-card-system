@@ -41,6 +41,22 @@ springdoc:
       paths-to-match: /api/auth/**
       display-name: Unauthenticated User API
 
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    com.example.bankcards: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/app.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 7
+      total-size-cap: 100MB
+
+
 jwt:
   secret-key: ${JWT_SECRET}
   expiration: 360000000
@@ -61,7 +77,6 @@ app:
     validity-period-days: 1825 # 5 years
     validity-check-cron: "0 0 0 * * *"
   currencies:
-    default: RUB
     rates:
       USD:
         RUB: 90.50

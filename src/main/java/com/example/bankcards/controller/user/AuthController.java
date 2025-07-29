@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "Authentication")
 public class AuthController {
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final AuthService authService;
 
     @Operation(
@@ -54,6 +57,7 @@ public class AuthController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponseDto register(@Valid @RequestBody UserRegisterDto userRegisterDto) {
+        log.debug("Request received: Register user with email {}", userRegisterDto.email());
         return authService.register(userRegisterDto);
     }
 
@@ -88,6 +92,7 @@ public class AuthController {
     )
     @PostMapping("/login")
     public AuthResponseDto login(@Valid @RequestBody UserLoginDto userLoginDto) {
+        log.debug("Request received: Log in user with email {}", userLoginDto.email());
         return authService.login(userLoginDto);
     }
 }

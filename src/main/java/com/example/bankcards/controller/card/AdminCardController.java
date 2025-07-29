@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +34,7 @@ import java.util.UUID;
 @Tag(name = "Admin - Cards", description = "Admin operations for cards")
 public class AdminCardController {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminCardController.class);
     private final AdminCardService adminCardService;
 
     @Operation(
@@ -80,9 +83,12 @@ public class AdminCardController {
             @RequestParam(name = "status", required = false) CardStatus status,
 
             @Parameter(hidden = true)
-            @PageableDefault(page = 0, size = 5, sort = "balance", direction = Sort.Direction.DESC)
+            @PageableDefault(size = 5, sort = "balance", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
+        log.debug("Admin request received: Search cards with: " +
+                "balance = {}, isGreater = {}, ownerId = {}, status = {}", balance, isGreater, ownerId, status);
+
         Specification<Card> specification = Specification.where(
                         CardSpecification.hasBalance(balance, isGreater))
                 .and(CardSpecification.hasOwnerId(ownerId))
@@ -118,6 +124,7 @@ public class AdminCardController {
                     example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") UUID id
     ) {
+        log.debug("Admin request received: Get card by id: {}", id);
         return adminCardService.getCardById(id);
     }
 
@@ -150,6 +157,8 @@ public class AdminCardController {
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public CardDto createCard(@RequestBody CardCreationDto cardCreationDto) {
+        log.debug("Request received: Create card in {} for user with id: {}",
+                cardCreationDto.currency(), cardCreationDto.userId());
         return adminCardService.createCard(cardCreationDto);
     }
 
@@ -178,6 +187,7 @@ public class AdminCardController {
                     example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable("id") UUID id
     ) {
+        log.debug("Admin request received: Delete card with id: {}", id);
         adminCardService.deleteCardById(id);
     }
 
@@ -215,6 +225,8 @@ public class AdminCardController {
     )
     @PatchMapping("/status")
     public CardDto updateCardStatus(@RequestBody @Valid CardStatusUpdateDto cardStatusUpdateDto) {
+        log.debug("Admin request received: Update status of card with id {} to {}",
+                cardStatusUpdateDto.cardId(), cardStatusUpdateDto.status());
         return adminCardService.updateCardStatus(cardStatusUpdateDto);
     }
 }

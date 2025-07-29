@@ -15,12 +15,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getEntityByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(()->new NotFoundException("User not found"));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("User with email %s not found", email)));
+
     }
 
     @Override
     public User getEntityById(UUID id) {
-        return userRepository.findById(id).orElseThrow(()->new NotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(()->new NotFoundException("User with id %s not found"));
     }
 
 }

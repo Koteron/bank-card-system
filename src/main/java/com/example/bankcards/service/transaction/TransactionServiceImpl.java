@@ -13,6 +13,8 @@ import com.example.bankcards.repository.TransactionRepository;
 import com.example.bankcards.service.card.CardService;
 import com.example.bankcards.service.currency.CurrencyService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
 public class TransactionServiceImpl implements TransactionService {
+    private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
     private final TransactionRepository transactionRepository;
     private final CardService cardService;
     private final CurrencyService currencyService;
@@ -84,6 +87,9 @@ public class TransactionServiceImpl implements TransactionService {
                         .timestamp(LocalDateTime.now())
                         .type(TransactionType.TRANSFER)
                         .build());
+
+        log.info("Successfully made transaction from card with id {} to card with id {} for {} {}",
+                cardFrom.getId(), cardTo.getId(), transferRequestDto.amount(), cardFrom.getCurrency());
         return updatedCardFrom;
     }
 
@@ -124,6 +130,9 @@ public class TransactionServiceImpl implements TransactionService {
                         .timestamp(LocalDateTime.now())
                         .type(TransactionType.DEPOSIT)
                         .build());
+
+        log.info("Successfully deposited money to card with id {} for {} {}",
+                card.getId(), oneCardOperationDto.amount(), oneCardOperationDto.currency());
         return updatedCard;
     }
 
@@ -166,6 +175,9 @@ public class TransactionServiceImpl implements TransactionService {
                         .timestamp(LocalDateTime.now())
                         .type(TransactionType.WITHDRAWAL)
                         .build());
+
+        log.info("Successfully withdrawn money from card with id {} for {} {}",
+                card.getId(), oneCardOperationDto.amount(), oneCardOperationDto.currency());
         return updatedCard;
     }
 }

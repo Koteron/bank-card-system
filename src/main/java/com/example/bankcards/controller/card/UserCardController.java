@@ -13,6 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,6 +32,7 @@ import java.util.UUID;
 @RequestMapping("/api/cards")
 @Tag(name = "User - Cards")
 public class UserCardController {
+    private static final Logger log = LoggerFactory.getLogger(UserCardController.class);
     private final UserCardService userCardService;
 
     @Operation(
@@ -74,12 +77,14 @@ public class UserCardController {
             @RequestParam(name = "status", required = false) CardStatus status,
 
             @Parameter(hidden = true)
-            @PageableDefault(page = 0, size = 5, sort = "balance", direction = Sort.Direction.DESC)
+            @PageableDefault(size = 5, sort = "balance", direction = Sort.Direction.DESC)
             Pageable pageable,
 
             @Parameter(hidden = true)
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.debug("Request received: Search cards with: " +
+                "balance = {}, isGreater = {}, status = {}", balance, isGreater, status);
         Specification<Card> specification = Specification.where(
                         CardSpecification.hasBalance(balance, isGreater))
                 .and(CardSpecification.hasOwnerId(userDetails.getUser().getId()))
@@ -130,6 +135,7 @@ public class UserCardController {
             @Parameter(hidden = true)
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.debug("Request received: Request lock of card with id {}", cardId);
         return userCardService.requestCardLock(cardId, userDetails.getUser().getId());
     }
 }

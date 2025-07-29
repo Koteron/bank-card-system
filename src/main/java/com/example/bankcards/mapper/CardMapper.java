@@ -2,7 +2,7 @@ package com.example.bankcards.mapper;
 
 import com.example.bankcards.dto.card.CardDto;
 import com.example.bankcards.entity.Card;
-import com.example.bankcards.exception.SystemErrorException;
+import com.example.bankcards.exception.InternalServerErrorException;
 import com.example.bankcards.util.AesEncryptionUtil;
 import com.example.bankcards.util.CardNumberUtil;
 import org.mapstruct.Mapper;
@@ -28,7 +28,7 @@ public abstract class CardMapper {
             String decrypted = aesEncryptionUtil.decrypt(encryptedNumber);
             return CardNumberUtil.maskCardNumber(decrypted);
         } catch (Exception e) {
-            throw new SystemErrorException(e.getMessage());
+            throw new InternalServerErrorException(e.getMessage());
         }
     }
 }

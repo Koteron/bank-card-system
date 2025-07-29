@@ -30,19 +30,25 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponseDto register(UserRegisterDto userRegisterDto) {
         Optional<User> foundUser = userRepository.findByEmail(userRegisterDto.email());
         if (foundUser.isPresent()) {
-            log.error("User {} already exists", userRegisterDto.email());
-            throw new ForbiddenException("Email is already in use!");
+            throw new ForbiddenException(String.format("User with email %s already exists",
+                    userRegisterDto.email()));
         }
         String passwordHash = passwordUtil.encrypt(userRegisterDto.password());
         User newUser = userRepository.save(userMapper.toNewUserEntity(userRegisterDto, passwordHash));
-        return userMapper.toAuthResponseDto(newUser, jwtTokenProvider.generateToken(newUser.getEmail()));
+        AuthResponseDto authResponseDto = userMapper.toAuthResponseDto(newUser,
+                jwtTokenProvider.generateToken(newUser.getEmail()));
+        log.info("User {} registered successfully", newUser.getEmail());
+        return authResponseDto;
     }
 
     public AuthResponseDto login(UserLoginDto userLoginDto) {
         User user = userRepository.findByEmail(userLoginDto.email())
                 .orElseThrow(() -> new NotFoundException("User not found!"));
         if (passwordUtil.matches(userLoginDto.password(), user.getPasswordHash())) {
-            return userMapper.toAuthResponseDto(user, generateToken(user.getEmail()));
+            AuthResponseDto authResponseDto =
+                    userMapper.toAuthResponseDto(user, generateToken(user.getEmail()));
+            log.info("User {} logged in", user.getEmail());
+            return authResponseDto;
         }
         throw new UnauthorizedException("Wrong password!");
     }

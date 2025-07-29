@@ -12,6 +12,5 @@ import java.util.Map;
 @Getter
 @Setter
 public class CurrencyProperties {
-    private String defaultCurrency;
     private Map<Currency, Map<Currency, BigDecimal>> rates;
 }

@@ -9,7 +9,7 @@ import com.example.bankcards.entity.util.CardStatus;
 import com.example.bankcards.entity.util.Currency;
 import com.example.bankcards.exception.CardExistsException;
 import com.example.bankcards.exception.NotFoundException;
-import com.example.bankcards.exception.SystemErrorException;
+import com.example.bankcards.exception.InternalServerErrorException;
 import com.example.bankcards.mapper.CardMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.service.user.UserService;
@@ -107,7 +107,7 @@ class AdminCardServiceImplTest {
     void createCard_encryptionFails_throwsSystemError() throws Exception {
         when(aesEncryptionUtil.encrypt(anyString())).thenThrow(new RuntimeException("fail"));
 
-        assertThrows(SystemErrorException.class, () -> adminCardService.createCard(creationDto));
+        assertThrows(InternalServerErrorException.class, () -> adminCardService.createCard(creationDto));
         verify(aesEncryptionUtil).encrypt(anyString());
         verifyNoInteractions(cardRepository);
     }

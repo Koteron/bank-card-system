@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "Transactions")
 public class TransactionController {
+    private static final Logger log = LoggerFactory.getLogger(TransactionController.class);
     private final TransactionService transactionService;
 
     @Operation(
@@ -67,6 +70,7 @@ public class TransactionController {
             @RequestBody @Valid TransferRequestDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.debug("Request received: Transfer money from one user's card to another");
         return transactionService.transfer(userDetails.getUser(), request);
     }
 
@@ -113,6 +117,7 @@ public class TransactionController {
             @RequestBody @Valid OneCardOperationDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.debug("Request received: Deposit money to user's card");
         return transactionService.deposit(userDetails.getUser(), request);
     }
 
@@ -159,6 +164,7 @@ public class TransactionController {
             @RequestBody @Valid OneCardOperationDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.debug("Request received: Withdraw money from user's card");
         return transactionService.withdraw(userDetails.getUser(), request);
     }
 }

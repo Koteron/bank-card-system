@@ -67,7 +67,7 @@ Java 17+, Spring Boot, Spring Security, Spring Data JPA, JWT, PostgreSQL, Liquib
 ## ▶️ Запуск
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ---
